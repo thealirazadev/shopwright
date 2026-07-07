@@ -20,8 +20,10 @@ Enforce isolation in the database with row-level security, not just in the ORM:
 - The application sets the tenant with `set_config('app.tenant_id', …, true)`
   at the start of each transaction — transaction-local, so nothing leaks
   across pooled connections.
-- The setting is read with `current_setting(…, missing_ok := true)`, which
-  returns NULL when unset: **no tenant context means no rows**. Fail closed.
+- Policies read the setting as `NULLIF(current_setting(…, true), '')`:
+  **no tenant context means no rows**. Fail closed. (The NULLIF matters — on a
+  pooled connection where an earlier transaction set the GUC, an unset value
+  comes back as `''`, not NULL, and a bare `::uuid` cast would error.)
 - The application connects as a dedicated non-superuser role. Superuser and
   `BYPASSRLS` roles are for migrations and operations only, never the app path.
 - ORM-level tenant filters remain as a convenience, but they are not the

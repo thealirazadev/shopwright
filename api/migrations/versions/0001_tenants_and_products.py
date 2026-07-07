@@ -39,15 +39,16 @@ def upgrade() -> None:
     )
 
     # Tenant isolation is enforced here, in the database, not in application
-    # queries (ADR-003). FORCE makes the policy apply to the table owner too;
-    # missing_ok=true means "no tenant context" reads as NULL and matches
-    # nothing — fail closed.
+    # queries (ADR-003). FORCE makes the policy apply to the table owner too.
+    # "No tenant context" must match nothing: current_setting(..., true) is
+    # NULL when the GUC was never set, but '' on a pooled connection where a
+    # previous transaction set it — NULLIF folds both into NULL. Fail closed.
     op.execute("ALTER TABLE products ENABLE ROW LEVEL SECURITY")
     op.execute("ALTER TABLE products FORCE ROW LEVEL SECURITY")
     op.execute(
         """
         CREATE POLICY tenant_isolation ON products
-        USING (tenant_id = current_setting('app.tenant_id', true)::uuid)
+        USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid)
         """
     )
 
