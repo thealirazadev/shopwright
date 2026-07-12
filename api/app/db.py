@@ -1,6 +1,7 @@
 import uuid
 from collections.abc import Iterator
 from contextlib import contextmanager
+from functools import lru_cache
 
 from sqlalchemy import Connection, Engine, create_engine, text
 
@@ -9,6 +10,11 @@ from app.config import get_settings
 
 def build_engine() -> Engine:
     return create_engine(get_settings().database_url, pool_pre_ping=True)
+
+
+@lru_cache
+def get_engine() -> Engine:
+    return build_engine()
 
 
 @contextmanager

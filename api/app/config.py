@@ -9,6 +9,15 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://shopwright:shopwright@localhost:5432/shopwright"
     redis_url: str = "redis://localhost:6379/0"
 
+    app_url: str = "http://localhost:8000"
+
+    shopify_api_key: str = ""
+    shopify_api_secret: str = ""
+    shopify_scopes: str = "read_products,read_content"
+
+    # Fernet key encrypting store access tokens at rest (see .env.example).
+    token_encryption_key: str = ""
+
 
 @lru_cache
 def get_settings() -> Settings:
