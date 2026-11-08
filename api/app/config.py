@@ -18,6 +18,12 @@ class Settings(BaseSettings):
     # Fernet key encrypting store access tokens at rest (see .env.example).
     token_encryption_key: str = ""
 
+    # Embeddings (Voyage AI). Without a key, a local hashing embedder is used.
+    voyage_api_key: str = ""
+    embedding_model: str = "voyage-3.5"
+
+    agent_model: str = "claude-sonnet-5-5"
+
 
 @lru_cache
 def get_settings() -> Settings:
