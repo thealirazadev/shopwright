@@ -40,7 +40,8 @@ def admin_engine() -> Iterator[Engine]:
             )
         )
         conn.execute(text(f"GRANT USAGE ON SCHEMA public TO {TEST_ROLE}"))
-        conn.execute(text(f"GRANT SELECT, INSERT, UPDATE, DELETE ON products TO {TEST_ROLE}"))
+        grant = "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public"
+        conn.execute(text(f"{grant} TO {TEST_ROLE}"))
         conn.execute(text("TRUNCATE tenants CASCADE"))
 
     yield engine
@@ -69,3 +70,12 @@ def tenants(admin_engine: Engine) -> tuple[uuid.UUID, uuid.UUID]:
             )
         ).fetchall()
     return rows[0][0], rows[1][0]
+
+
+@pytest.fixture
+def clean_catalog(admin_engine: Engine) -> Iterator[None]:
+    with admin_engine.begin() as conn:
+        conn.execute(text("TRUNCATE chunks, policies, products"))
+    yield
+    with admin_engine.begin() as conn:
+        conn.execute(text("TRUNCATE chunks, policies, products"))
