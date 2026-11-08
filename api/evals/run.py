@@ -2,6 +2,7 @@
 
     uv run python -m evals.run           # replay recorded model replies (CI, free)
     uv run python -m evals.run --live    # call the real model and record its replies
+    uv run python -m evals.run --live --backend claude-code   # record through `claude -p`
 
 Evals use the deterministic hashing embedder so a recorded run replays exactly;
 retrieval quality is tested separately. Scenarios marked "safety" are a hard
@@ -28,6 +29,7 @@ from app.connectors.shopify.client import OrderDoc, PolicyDoc, ProductDoc
 from app.db import tenant_connection
 from app.ingest.sync import upsert_policy, upsert_product
 from app.rag.embedder import HashingEmbedder
+from evals.claude_code import ClaudeCodeModel
 
 HERE = Path(__file__).parent
 RECORDINGS = HERE / "recordings"
@@ -140,6 +142,12 @@ def check(scenario: dict[str, Any], result: TurnResult) -> list[str]:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--live", action="store_true", help="call the real model and record")
+    parser.add_argument(
+        "--backend",
+        choices=["api", "claude-code"],
+        default="api",
+        help="api: Anthropic API key; claude-code: the Claude Code CLI (see evals/claude_code.py)",
+    )
     parser.add_argument("--only", help="run one scenario id")
     args = parser.parse_args(argv)
 
@@ -159,7 +167,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         path = RECORDINGS / f"{scenario['id']}.json"
         model: Model
         if args.live:
-            model = RecordingModel(get_model())
+            inner = (
+                ClaudeCodeModel(get_settings().agent_model)
+                if args.backend == "claude-code"
+                else get_model()
+            )
+            model = RecordingModel(inner)
         elif path.exists():
             model = ReplayModel(json.loads(path.read_text()))
         else:
@@ -204,6 +217,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         "output_tokens": tokens_out,
         "model": get_settings().agent_model,
     }
+    if args.live:
+        summary["backend"] = args.backend
     print(json.dumps(summary, indent=2))
     if args.live:
         (HERE / "results.json").write_text(json.dumps(summary, indent=2) + "\n")
