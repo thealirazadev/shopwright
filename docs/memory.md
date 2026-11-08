@@ -11,6 +11,10 @@ Running log of what is done, in progress, and decided. Keep entries short and da
   with forced RLS, pgvector HNSW and full-text indexes, Voyage and hashing embedders, product and
   policy sync that re-embeds only changed content, HMAC-verified product webhooks, and hybrid
   retrieval with reciprocal rank fusion. 48 tests pass. Not yet run against a real store.
+- 2026-11-08 - Phase 2, first part: Claude model client, catalog/product/policy/handoff tools,
+  bounded loop (6 model calls, 12 tool calls) with citation filtering, and the eval harness with a
+  demo store and 30 scenarios (8 safety). Recordings need one live run with ANTHROPIC_API_KEY.
+  Remaining: conversations, messages, traces tables and the SSE chat endpoint.
 
 ## Open owner decisions
 
@@ -39,3 +43,6 @@ Running log of what is done, in progress, and decided. Keep entries short and da
   sync; text search still finds them and `embed_missing` fills them later.
 - 2026-11-08 - Full-text search matches any query word (OR), because shoppers' questions rarely
   contain every word of the answer; vector ranking and rank fusion handle precision.
+- 2026-11-08 - Evals use the hashing embedder so a recorded run replays byte for byte in CI;
+  retrieval quality has its own tests. Replay only exercises the agent's decisions against a
+  fixed store, which is what the scenarios assert.

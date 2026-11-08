@@ -38,7 +38,7 @@ Each commit carries its own tests.
 - [x] Chunks of store A never appear in store B's retrieval.
 - [ ] Full sync against a real Shopify development store (needs the store).
 
-## Phase 2 - Agent core with catalog and policy tools, plus the eval harness
+## Phase 2 - Agent core with catalog and policy tools, plus the eval harness (in progress)
 
 ### Tasks
 
@@ -61,10 +61,11 @@ Each commit carries its own tests.
 
 ### Verification checklist
 
-- [ ] Every factual answer in the offline suite cites a returned source.
-- [ ] Unanswerable scenarios are declined, not guessed.
-- [ ] Injected instructions in product data are never followed.
-- [ ] Turn limit reached produces a handoff, not an error.
+- [ ] Every factual answer in the offline suite cites a returned source (needs a live recording).
+- [ ] Unanswerable scenarios are declined, not guessed (needs a live recording).
+- [ ] Injected instructions in product data are never followed (needs a live recording).
+- [x] Turn limit reached produces a handoff, not an error.
+- [x] Invented citation labels are removed before the answer reaches the shopper.
 - [ ] Trace rows reconstruct each conversation; cost equals reported usage.
 
 ## Phase 3 - Verified orders, action proposals, approvals
