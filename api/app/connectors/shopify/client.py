@@ -32,6 +32,19 @@ query Products($cursor: String) {
 
 POLICIES_QUERY = "query { shop { shopPolicies { type title body url } } }"
 
+ORDER_QUERY = """
+query Order($q: String!) {
+  orders(first: 1, query: $q) {
+    nodes {
+      id name email createdAt displayFinancialStatus displayFulfillmentStatus
+      totalPriceSet { shopMoney { amount currencyCode } }
+      lineItems(first: 50) { nodes { title quantity } }
+      fulfillments(first: 10) { trackingInfo { company number url } }
+    }
+  }
+}
+"""
+
 
 class ShopifyError(Exception):
     pass
@@ -86,6 +99,44 @@ class PolicyDoc:
     title: str
     body_html: str
     url: str | None
+
+
+@dataclass(frozen=True)
+class OrderDoc:
+    external_id: str
+    number: str
+    email: str
+    created_at: str
+    financial_status: str
+    fulfillment_status: str
+    total: str
+    currency: str
+    items: list[dict[str, Any]]
+    tracking: list[dict[str, Any]]
+
+    @classmethod
+    def from_graphql(cls, node: dict[str, Any]) -> "OrderDoc":
+        money = node["totalPriceSet"]["shopMoney"]
+        return cls(
+            external_id=node["id"],
+            number=normalize_order_number(node["name"]),
+            email=node.get("email") or "",
+            created_at=node["createdAt"],
+            financial_status=node.get("displayFinancialStatus") or "",
+            fulfillment_status=node.get("displayFulfillmentStatus") or "",
+            total=str(money["amount"]),
+            currency=money["currencyCode"],
+            items=[
+                {"title": i["title"], "quantity": i["quantity"]} for i in node["lineItems"]["nodes"]
+            ],
+            tracking=[
+                t for f in node.get("fulfillments") or [] for t in f.get("trackingInfo") or []
+            ],
+        )
+
+
+def normalize_order_number(raw: str) -> str:
+    return raw.strip().lstrip("#").strip()
 
 
 def _amount(money: dict[str, Any] | None) -> Decimal | None:
@@ -165,3 +216,10 @@ class ShopifyReadClient:
             for p in policies
             if p.get("body")
         ]
+
+    def find_order(self, order_number: str) -> OrderDoc | None:
+        number = normalize_order_number(order_number)
+        if not number.isalnum():
+            return None
+        nodes = self._query(ORDER_QUERY, {"q": f"name:#{number}"})["orders"]["nodes"]
+        return OrderDoc.from_graphql(nodes[0]) if nodes else None

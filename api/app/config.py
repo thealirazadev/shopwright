@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     shopify_api_key: str = ""
     shopify_api_secret: str = ""
-    shopify_scopes: str = "read_products,read_content"
+    shopify_scopes: str = "read_products,read_content,read_orders,write_orders"
 
     # Fernet key encrypting store access tokens at rest (see .env.example).
     token_encryption_key: str = ""
