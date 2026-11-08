@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
 
     app_url: str = "http://localhost:8000"
+    # Origins allowed to call the API from a browser (widget on storefronts, dashboard).
+    # Auth is a bearer token, never a cookie, so "*" does not expose sessions.
+    cors_origins: str = "*"
 
     shopify_api_key: str = ""
     shopify_api_secret: str = ""
