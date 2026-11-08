@@ -37,6 +37,33 @@ jobs:
       - run: uv run pytest
       - run: uv run python -m evals.run
 
+  docker:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: shopwright
+          POSTGRES_PASSWORD: shopwright
+          POSTGRES_DB: shopwright
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U shopwright"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t shopwright-api api
+      - name: Migrations run and the API answers its health check
+        run: |
+          docker run -d --name api --network host \
+            -e DATABASE_URL=postgresql+psycopg://shopwright:shopwright@localhost:5432/shopwright \
+            shopwright-api
+          for i in $(seq 30); do curl -sf localhost:8000/health && exit 0; sleep 1; done
+          docker logs api; exit 1
+
   dashboard:
     runs-on: ubuntu-latest
     defaults:
