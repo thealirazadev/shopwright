@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     embedding_model: str = "voyage-3.5"
 
     anthropic_api_key: str = ""
+    # Signs short-lived widget tokens that bind a chat session to one store.
+    widget_token_secret: str = ""
     agent_model: str = "claude-sonnet-5-5"
 
 
