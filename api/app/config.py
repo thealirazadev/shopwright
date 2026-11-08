@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     voyage_api_key: str = ""
     embedding_model: str = "voyage-3.5"
 
+    anthropic_api_key: str = ""
     agent_model: str = "claude-sonnet-5-5"
 
 
