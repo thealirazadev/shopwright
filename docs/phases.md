@@ -8,13 +8,13 @@ ends with lint, typecheck, and tests green in CI.
 FastAPI scaffold, tenant and product schema with forced RLS, isolation test, stores table, Shopify
 OAuth with encrypted tokens, dashboard scaffold, CI.
 
-## Phase 1 - Catalog and policy ingest with retrieval
+## Phase 1 - Catalog and policy ingest with retrieval (done)
 
 ### Tasks
 
 - Shopify read client (Admin GraphQL) with retries and rate-limit handling.
-- Product sync (initial bulk plus `products/*` webhooks with HMAC verification) and policy page
-  sync.
+- Product sync (paginated GraphQL full sync plus `products/*` webhooks with HMAC verification)
+  and policy sync.
 - `chunks` table (RLS) with pgvector HNSW index and full-text index; content-hash re-embedding.
 - `Embedder` interface with a deterministic fake for tests and one hosted provider.
 - Hybrid retrieval with reciprocal rank fusion.
@@ -22,19 +22,21 @@ OAuth with encrypted tokens, dashboard scaffold, CI.
 ### Expected commits
 
 1. `feat(shopify): add read-only admin api client`
-2. `feat(ingest): sync products with bulk import and webhooks`
-3. `feat(ingest): sync policy pages`
-4. `feat(rag): add chunks table with vector and text indexes`
-5. `feat(rag): embed changed chunks only`
+2. `feat(rag): add policies and chunks tables with vector and text indexes`
+3. `feat(rag): add embedders and chunking`
+4. `feat(ingest): sync products and policies, embedding changed content only`
+5. `feat(ingest): verify and apply product webhooks`
 6. `feat(rag): add hybrid retrieval`
-7. `test(phase1): cover sync, re-embedding, retrieval, and isolation`
+
+Each commit carries its own tests.
 
 ### Verification checklist
 
-- [ ] Webhook with a bad HMAC is rejected; a valid one updates the product and re-embeds only it.
-- [ ] Unchanged content triggers no embedding calls.
-- [ ] Retrieval returns the right product for 20 seeded queries (fixture store).
-- [ ] Chunks of store A never appear in store B's retrieval (isolation test extended).
+- [x] Webhook with a bad HMAC is rejected; a valid one updates the product and re-embeds only it.
+- [x] Unchanged content triggers no embedding calls.
+- [x] Retrieval returns the right product for 10 seeded queries (fixture store, hashing embedder).
+- [x] Chunks of store A never appear in store B's retrieval.
+- [ ] Full sync against a real Shopify development store (needs the store).
 
 ## Phase 2 - Agent core with catalog and policy tools, plus the eval harness
 

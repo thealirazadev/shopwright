@@ -4,7 +4,8 @@ AI support copilot for Shopify and WooCommerce stores. Merchants connect their
 store and get a chat widget that answers customer questions from their own
 catalog, policies, and orders — embeddable with a single script tag.
 
-**Status:** early development. Building the Shopify connector and RAG pipeline first.
+**Status:** in development. Phase 1 (Shopify catalog and policy sync, hybrid retrieval) is done;
+phase 2 (the agent loop and eval harness) is next. See [docs/phases.md](docs/phases.md).
 
 ## Architecture
 

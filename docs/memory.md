@@ -6,8 +6,11 @@ Running log of what is done, in progress, and decided. Keep entries short and da
 
 - 2026-07-12 - Phase 0: FastAPI scaffold, tenant/product/store schema with forced RLS and an
   isolation test, Shopify OAuth with encrypted tokens, dashboard scaffold, CI.
-- 2026-11-08 - Planning docs added: PRD, architecture, phases, rules, testing. Awaiting owner
-  review before phase 1.
+- 2026-11-08 - Planning docs added: PRD, architecture, phases, rules, testing.
+- 2026-11-08 - Phase 1: read-only Shopify GraphQL client with retries, policies and chunks tables
+  with forced RLS, pgvector HNSW and full-text indexes, Voyage and hashing embedders, product and
+  policy sync that re-embeds only changed content, HMAC-verified product webhooks, and hybrid
+  retrieval with reciprocal rank fusion. 48 tests pass. Not yet run against a real store.
 
 ## Open owner decisions
 
@@ -28,3 +31,11 @@ Running log of what is done, in progress, and decided. Keep entries short and da
   `Embedder` interface, so no provider SDK is added. Anthropic has no embedding API, and Voyage is
   the provider Anthropic documents. Tests use a deterministic fake.
 - 2026-11-08 - Agent model: `claude-sonnet-5-5`, set in config.
+- 2026-11-08 - Full sync uses paginated GraphQL, not bulk operations: simpler, and fine for the
+  catalog sizes in ADR-002. Revisit for stores above roughly 10k products.
+- 2026-11-08 - Webhooks are applied inline rather than through the Redis queue; one product per
+  call is small. Move to the queue if webhook latency or volume requires it.
+- 2026-11-08 - A failed embedding call stores chunks with a NULL vector instead of failing the
+  sync; text search still finds them and `embed_missing` fills them later.
+- 2026-11-08 - Full-text search matches any query word (OR), because shoppers' questions rarely
+  contain every word of the answer; vector ranking and rank fusion handle precision.
