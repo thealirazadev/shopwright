@@ -1,14 +1,15 @@
 import { useCallback, useState } from "react";
 import { AuthError, saveToken, savedToken } from "./api";
+import { Approvals } from "./Approvals";
 import { Conversations } from "./Conversations";
 
-const TABS = ["Conversations"] as const;
+const TABS = ["Approvals", "Handoffs", "Conversations"] as const;
 type Tab = (typeof TABS)[number];
 
 export default function App() {
   const [token, setToken] = useState(savedToken);
   const [notice, setNotice] = useState("");
-  const [tab, setTab] = useState<Tab>("Conversations");
+  const [tab, setTab] = useState<Tab>("Approvals");
 
   const signOut = useCallback((message = "") => {
     saveToken("");
@@ -54,6 +55,8 @@ export default function App() {
           </button>
         ))}
       </nav>
+      {tab === "Approvals" && <Approvals token={token} onError={onError} />}
+      {tab === "Handoffs" && <Conversations token={token} onError={onError} status="handoff" />}
       {tab === "Conversations" && <Conversations token={token} onError={onError} />}
     </main>
   );
