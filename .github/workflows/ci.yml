@@ -35,6 +35,7 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run mypy
       - run: uv run pytest
+      - run: uv run python -m evals.run
 
   dashboard:
     runs-on: ubuntu-latest
