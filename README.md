@@ -1,14 +1,21 @@
 # Shopwright
 
-AI support copilot for Shopify and WooCommerce stores. Merchants connect their
-store and get a chat widget that answers customer questions from their own
-catalog, policies, and orders — embeddable with a single script tag.
+AI support copilot for Shopify stores. Merchants connect their store and get a chat widget that
+answers customer questions from their own catalog, policies, and orders, embeddable with a single
+script tag. A WooCommerce plugin is planned.
 
-**Status:** in development. Phases 1 and 2 are done: Shopify catalog and policy sync, hybrid
-retrieval, a bounded Claude tool-use agent with verified citations, `POST /v1/chat` with stored
-traces, and an eval suite of 34 scenarios with safety gates. Phase 3 is done too: the agent
-verifies the shopper before showing any order, and refunds, returns, and cancellations are
-proposals a merchant approves; the agent's code cannot reach Shopify's write API. See [docs/phases.md](docs/phases.md).
+**Status:** phases 1 to 4 are done.
+
+- Shopify catalog and policy sync, and hybrid retrieval (pgvector plus full-text, rank fusion).
+- A bounded Claude tool-use agent with verified citations, and an eval suite of 34 scenarios with
+  safety gates that runs in CI.
+- The agent verifies the shopper before showing any order. Refunds, returns, and cancellations are
+  proposals a merchant approves; the agent's code cannot reach Shopify's write API.
+- Every store's data is isolated with Postgres row-level security.
+- An embeddable widget and a merchant dashboard (approvals, handoffs, conversation timelines,
+  daily cost).
+
+See [docs/phases.md](docs/phases.md).
 
 ## Architecture
 
@@ -18,8 +25,8 @@ React dashboard (Vercel) ──► FastAPI core API
                                 │  Redis (Upstash)
                                 ├─► LLM client + RAG pipeline
   Shopify app (OAuth+webhooks) ─┤
-  WooCommerce plugin (PHP) ─────┘
-  Embeddable chat widget (vanilla JS, signed JWT)
+  WooCommerce plugin (planned) ──┘
+  Embeddable chat widget (vanilla TS, signed per-store token)
 ```
 
 The API is a modular monolith — see [docs/adr](docs/adr) for why, and for the
@@ -33,7 +40,7 @@ row-level security for tenant isolation).
 | `api/` | FastAPI core — connectors, ingest, RAG, chat |
 | `dashboard/` | Merchant dashboard (React + TypeScript + Tailwind) |
 | `widget/` | Embeddable chat widget (vanilla TS) |
-| `plugin-woocommerce/` | WordPress plugin (phase 2) |
+| `plugin-woocommerce/` | WordPress plugin (planned, not started) |
 | `docs/adr/` | Architecture decision records |
 
 ## Local development
