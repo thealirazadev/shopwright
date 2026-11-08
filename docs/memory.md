@@ -22,10 +22,19 @@ Running log of what is done, in progress, and decided. Keep entries short and da
   approvals API (`/v1/admin/proposals`) behind merchant-role tokens; a separate Shopify write
   client reachable only from `app.actions`, guarded by an import-boundary test. Eval suite: 34
   scenarios, 8 safety. 78 tests pass.
+- 2026-11-08 - Phase 4: public `POST /v1/widget/session` (shop domain to a one-hour widget token),
+  CORS for browser callers, a vanilla TypeScript widget in a shadow root (about 6 KB), read-only
+  dashboard API (conversations, handoff queue, timeline from traces, cost per day), a merchant
+  token CLI, and dashboard tabs for approvals, handoffs, conversations, and cost. 86 tests pass.
 
 ## Open owner decisions
 
 - Shopify development store for the demo and the live eval run.
+- Merchant sign-in: v1 uses an operator-issued merchant token pasted into the dashboard
+  (`python -m app.dashboard.token`). Embedding the dashboard in Shopify admin with Shopify session
+  tokens is the likely replacement; it needs a Shopify app listing decision.
+- Model prices for the cost overview are config (`AGENT_*_USD_PER_MTOK`, default 0) rather than
+  hardcoded, so they track Anthropic's pricing page.
 
 ## Decisions log
 
@@ -65,3 +74,10 @@ Running log of what is done, in progress, and decided. Keep entries short and da
   need a person's judgement in v1. The agent still cannot trigger any of them.
 - 2026-11-08 - Merchant and widget tokens share the signing secret but carry a role claim; each
   API accepts only its own role, so a widget token cannot approve anything.
+- 2026-11-08 - The widget token endpoint is public: the widget runs on the storefront, so anyone
+  may chat with a store's assistant. The token binds the session to one store and carries the
+  widget role, so it cannot reach the merchant API. Per-tenant cost caps are the abuse control
+  still to build.
+- 2026-11-08 - CORS allows `*` by default because auth is a bearer header, never a cookie.
+  Restrict with `CORS_ORIGINS` in production.
+- 2026-11-08 - The widget still uses JSON replies, not SSE; streaming remains deferred.

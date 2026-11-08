@@ -114,8 +114,8 @@ Each commit carries its own tests.
 
 ### Verification checklist
 
-- [ ] A token for store A cannot read store B.
-- [ ] Approving from the dashboard executes the action exactly once.
+- [x] A token for store A cannot read store B (`test_a_store_cannot_read_another_stores_data`).
+- [x] Approving from the dashboard executes the action exactly once (`test_a_cancellation_executes_exactly_once`).
 
 ## Phase 5 - Launch: published results
 
