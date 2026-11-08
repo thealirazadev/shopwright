@@ -15,6 +15,7 @@ from app.agent.tools import OrderSource, ToolContext
 from app.chat import tokens
 from app.config import get_settings
 from app.connectors.shopify.client import OrderDoc, ShopifyReadClient
+from app.connectors.shopify.oauth import valid_shop_domain
 from app.crypto import get_cipher
 from app.db import get_engine, tenant_connection
 from app.rag.embedder import Embedder, get_embedder
@@ -163,6 +164,37 @@ def _save_turn(
             "id": conversation_id,
         },
     )
+
+
+class SessionRequest(BaseModel):
+    shop: str = Field(max_length=255)
+
+
+class SessionResponse(BaseModel):
+    token: str
+    expires_in: int
+
+
+@router.post("/widget/session", response_model=SessionResponse)
+def widget_session(body: SessionRequest) -> SessionResponse:
+    """Exchange an installed shop's domain for a short-lived widget token.
+
+    Public by design: the widget runs on the storefront, so anyone can chat with a store's
+    assistant. The token only binds the session to that one store; it grants no merchant access.
+    """
+    if not valid_shop_domain(body.shop):
+        raise HTTPException(status_code=404, detail="unknown store")
+    with get_engine().connect() as conn:
+        tenant_id = conn.execute(
+            text("SELECT tenant_id FROM stores WHERE shop_domain = :shop"), {"shop": body.shop}
+        ).scalar()
+    if tenant_id is None:
+        raise HTTPException(status_code=404, detail="unknown store")
+    secret = get_settings().widget_token_secret
+    if not secret:
+        raise HTTPException(status_code=503, detail="chat is not configured")
+    token = tokens.issue(tenant_id, secret)
+    return SessionResponse(token=token, expires_in=tokens.DEFAULT_TTL_SECONDS)
 
 
 @router.post("/chat", response_model=ChatResponse)

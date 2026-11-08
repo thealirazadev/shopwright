@@ -120,3 +120,25 @@ def test_requests_without_a_valid_token_are_rejected(client: TestClient) -> None
     )
 
     assert response.status_code == 401
+
+
+def test_an_installed_shop_gets_a_widget_token_for_its_own_store(
+    client: TestClient, admin_engine: Engine, tenants: tuple[uuid.UUID, uuid.UUID]
+) -> None:
+    with admin_engine.begin() as conn:
+        conn.execute(text("DELETE FROM stores WHERE shop_domain = 'widget-a.myshopify.com'"))
+        conn.execute(
+            text(
+                "INSERT INTO stores (tenant_id, shop_domain, access_token) "
+                "VALUES (:t, 'widget-a.myshopify.com', 'x')"
+            ),
+            {"t": tenants[0]},
+        )
+
+    response = client.post("/v1/widget/session", json={"shop": "widget-a.myshopify.com"})
+    unknown = client.post("/v1/widget/session", json={"shop": "nobody.myshopify.com"})
+    invalid = client.post("/v1/widget/session", json={"shop": "evil.com"})
+
+    assert response.status_code == 200
+    assert tokens.verify(response.json()["token"], SECRET) == tenants[0]
+    assert unknown.status_code == invalid.status_code == 404
