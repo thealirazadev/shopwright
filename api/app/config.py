@@ -1,3 +1,4 @@
+from decimal import Decimal
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -26,6 +27,10 @@ class Settings(BaseSettings):
     # Signs short-lived widget tokens that bind a chat session to one store.
     widget_token_secret: str = ""
     agent_model: str = "claude-sonnet-5-5"
+    # USD per million tokens for the agent model, used by the dashboard's cost overview.
+    # Set these from Anthropic's current pricing page; at 0 the dashboard shows tokens only.
+    agent_input_usd_per_mtok: Decimal = Decimal("0")
+    agent_output_usd_per_mtok: Decimal = Decimal("0")
 
 
 @lru_cache
