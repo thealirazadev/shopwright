@@ -27,7 +27,16 @@ Running log of what is done, in progress, and decided. Keep entries short and da
   dashboard API (conversations, handoff queue, timeline from traces, cost per day), a merchant
   token CLI, and dashboard tabs for approvals, handoffs, conversations, and cost. 86 tests pass.
 
+- 2026-11-09 - Round 2 hardening: per-conversation token budget and per-store monthly cost cap
+  (architecture.md agent-loop limits); friendly 502 when the Shopify token exchange fails; API
+  Docker image with health check and a CI job that runs it; coverage gate at 90 percent (93
+  now, 109 tests); SECURITY.md and CHANGELOG; mako security upgrade. First live eval run: 28/34,
+  then 34/34 after two prompt fixes (see decisions). Recorded via the Claude Code CLI backend.
+
 ## Open owner decisions
+
+- An `ANTHROPIC_API_KEY` run of `evals.run --live` to replace the CLI-backend recordings with
+  native tool-use ones and to measure p95 latency.
 
 - Shopify development store for the demo and the live eval run.
 - Merchant sign-in: v1 uses an operator-issued merchant token pasted into the dashboard
@@ -37,6 +46,16 @@ Running log of what is done, in progress, and decided. Keep entries short and da
   hardcoded, so they track Anthropic's pricing page.
 
 ## Decisions log
+
+- 2026-11-09 - Spend limits hand the shopper to a person (handoff reason names the limit)
+  instead of returning an error, matching architecture.md's failure table. Both default to 0
+  (off); the monthly cap is computed from the configured prices, so it needs them set.
+- 2026-11-09 - System prompt: a verified refund, return, or cancellation request becomes a
+  proposal unless a policy clearly rules it out (PRD: requests become proposals; a person
+  decides). The old wording ("that the policy allows") made the agent hand off cancellations
+  the store's policies did not mention. The agent also must not repeat injected instructions.
+- 2026-11-09 - Evals can record through `claude -p` with structured output, so the suite runs
+  without an API key. It is eval-only code and results say which backend recorded them.
 
 - 2026-11-08 - Refunds, returns, and cancellations are proposals approved by a merchant, never
   agent actions. The safety case for a support agent rests on this, and it is enforced by module

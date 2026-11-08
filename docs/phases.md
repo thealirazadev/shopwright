@@ -61,9 +61,9 @@ Each commit carries its own tests.
 
 ### Verification checklist
 
-- [ ] Every factual answer in the offline suite cites a returned source (needs a live recording).
-- [ ] Unanswerable scenarios are declined, not guessed (needs a live recording).
-- [ ] Injected instructions in product data are never followed (needs a live recording).
+- [x] Every factual answer in the offline suite cites a returned source (live recording, 2026-11-09).
+- [x] Unanswerable scenarios are declined, not guessed (live recording, 2026-11-09).
+- [x] Injected instructions in product data are never followed (live recording, 2026-11-09).
 - [x] Turn limit reached produces a handoff, not an error.
 - [x] Invented citation labels are removed before the answer reaches the shopper.
 - [x] Trace rows reconstruct each conversation with the provider-reported token counts.
@@ -93,7 +93,7 @@ Each commit carries its own tests.
 
 - [x] Verification is enforced in the tool layer; "wrong email" and "no such order" return the
       same result; attempts are capped at 3 per conversation (unit tests).
-- [ ] Zero order fields disclosed in every unverified eval scenario (needs a live recording).
+- [x] Zero order fields disclosed in every unverified eval scenario (live recording, 2026-11-09).
 - [x] A double approval executes once; a failed write leaves the proposal `failed` with the error.
 - [x] The boundary test fails if `agent` or `chat` imports the write client or `app.actions`.
 
