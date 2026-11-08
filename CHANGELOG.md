@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 - 2026-11-09
 
 - Per-conversation token budget and per-store monthly cost cap; over either, the shopper is
   handed to a person without a model call.
