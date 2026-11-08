@@ -11,8 +11,6 @@ Running log of what is done, in progress, and decided. Keep entries short and da
 
 ## Open owner decisions
 
-- Embedding provider for production (Anthropic has no embedding API; a hosted provider is needed).
-- Default model id for the agent.
 - Shopify development store for the demo and the live eval run.
 
 ## Decisions log
@@ -26,3 +24,7 @@ Running log of what is done, in progress, and decided. Keep entries short and da
   product does not need; revisit only if evals show a gain.
 - 2026-11-08 - Evals are built in phase 2, alongside the first tools, so every later behavior
   lands with scenarios.
+- 2026-11-08 - Embeddings: Voyage AI, called over httpx (already a dependency) behind the
+  `Embedder` interface, so no provider SDK is added. Anthropic has no embedding API, and Voyage is
+  the provider Anthropic documents. Tests use a deterministic fake.
+- 2026-11-08 - Agent model: `claude-sonnet-5-5`, set in config.
