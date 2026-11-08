@@ -1,3 +1,6 @@
+import logging
+
+import httpx
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import RedirectResponse
 
@@ -6,6 +9,8 @@ from app.connectors.shopify import oauth
 from app.connectors.shopify.service import complete_install
 from app.crypto import get_cipher
 from app.db import get_engine
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/connect/shopify", tags=["connectors"])
 
@@ -47,9 +52,15 @@ def callback(request: Request) -> dict[str, str]:
     if not code:
         raise HTTPException(status_code=400, detail="missing authorization code")
 
-    access_token = oauth.exchange_code(
-        shop, code, settings.shopify_api_key, settings.shopify_api_secret
-    )
+    try:
+        access_token = oauth.exchange_code(
+            shop, code, settings.shopify_api_key, settings.shopify_api_secret
+        )
+    except (httpx.HTTPError, ValueError) as exc:
+        logger.error("shopify.token_exchange_failed", extra={"shop": shop, "error": str(exc)})
+        raise HTTPException(
+            status_code=502, detail="Shopify did not complete the install, please try again"
+        ) from exc
     tenant_id = complete_install(
         get_engine(),
         get_cipher(),
