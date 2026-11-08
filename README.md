@@ -14,6 +14,8 @@ script tag. A WooCommerce plugin is planned.
 - Every store's data is isolated with Postgres row-level security.
 - An embeddable widget and a merchant dashboard (approvals, handoffs, conversation timelines,
   daily cost).
+- Spend limits: a token budget per conversation and a monthly cost cap per store. Past either,
+  the shopper is handed to a person and the model is not called.
 
 See [docs/phases.md](docs/phases.md).
 
@@ -61,6 +63,13 @@ npm install
 npm run dev
 ```
 
+## Run with Docker
+
+```sh
+docker build -t shopwright-api api
+docker run -p 8000:8000 --env-file .env shopwright-api   # migrates, then serves; GET /health
+```
+
 ## Tests
 
 ```sh
@@ -68,4 +77,8 @@ cd api && uv run pytest
 ```
 
 The suite includes a tenant-isolation test that proves row-level security in
-Postgres — it needs the compose database running.
+Postgres — it needs the compose database running. Coverage is gated at 90 percent.
+
+Agent evals replay recorded model replies in CI (`uv run python -m evals.run`). To re-record,
+run `--live` with `ANTHROPIC_API_KEY`, or `--live --backend claude-code` to go through the
+Claude Code CLI instead. Security model: [SECURITY.md](SECURITY.md).
