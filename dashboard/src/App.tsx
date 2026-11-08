@@ -2,8 +2,9 @@ import { useCallback, useState } from "react";
 import { AuthError, saveToken, savedToken } from "./api";
 import { Approvals } from "./Approvals";
 import { Conversations } from "./Conversations";
+import { Costs } from "./Costs";
 
-const TABS = ["Approvals", "Handoffs", "Conversations"] as const;
+const TABS = ["Approvals", "Handoffs", "Conversations", "Costs"] as const;
 type Tab = (typeof TABS)[number];
 
 export default function App() {
@@ -58,6 +59,7 @@ export default function App() {
       {tab === "Approvals" && <Approvals token={token} onError={onError} />}
       {tab === "Handoffs" && <Conversations token={token} onError={onError} status="handoff" />}
       {tab === "Conversations" && <Conversations token={token} onError={onError} />}
+      {tab === "Costs" && <Costs token={token} onError={onError} />}
     </main>
   );
 }
