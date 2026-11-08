@@ -11,9 +11,11 @@ from sqlalchemy import Connection, text
 
 from app.agent.loop import HANDOFF_MESSAGE, TurnResult, run_turn
 from app.agent.model import Model, ModelError, get_model
-from app.agent.tools import ToolContext
+from app.agent.tools import OrderSource, ToolContext
 from app.chat import tokens
 from app.config import get_settings
+from app.connectors.shopify.client import OrderDoc, ShopifyReadClient
+from app.crypto import get_cipher
 from app.db import get_engine, tenant_connection
 from app.rag.embedder import Embedder, get_embedder
 
@@ -49,21 +51,49 @@ def model_dependency() -> Model:
         raise HTTPException(status_code=503, detail="assistant is not configured") from exc
 
 
+class StoreOrders:
+    """Read-only order lookup for one store, built lazily from its encrypted install token."""
+
+    def __init__(self, tenant_id: uuid.UUID) -> None:
+        self._tenant_id = tenant_id
+        self._client: ShopifyReadClient | None = None
+
+    def find_order(self, order_number: str) -> OrderDoc | None:
+        if self._client is None:
+            with get_engine().connect() as conn:
+                row = conn.execute(
+                    text("SELECT shop_domain, access_token FROM stores WHERE tenant_id = :t"),
+                    {"t": self._tenant_id},
+                ).first()
+            if row is None:
+                return None
+            token = get_cipher().decrypt(row.access_token)
+            self._client = ShopifyReadClient(row.shop_domain, token)
+        return self._client.find_order(order_number)
+
+
+def order_source_factory() -> Any:
+    return StoreOrders
+
+
 def _load_conversation(
     conn: Connection, tenant_id: uuid.UUID, conversation_id: uuid.UUID | None
-) -> tuple[uuid.UUID, str, list[dict[str, Any]]]:
+) -> tuple[uuid.UUID, str, list[dict[str, Any]], set[str], int]:
     if conversation_id is None:
         new_id: uuid.UUID = conn.execute(
             text("INSERT INTO conversations (tenant_id) VALUES (:t) RETURNING id"),
             {"t": tenant_id},
         ).scalar_one()
-        return new_id, "open", []
-    status = conn.execute(
+        return new_id, "open", [], set(), 0
+    row = conn.execute(
         # RLS already scopes this to the token's store; the explicit filter is defense in depth.
-        text("SELECT status FROM conversations WHERE id = :id AND tenant_id = :t FOR UPDATE"),
+        text(
+            "SELECT status, verified_orders, verify_attempts FROM conversations "
+            "WHERE id = :id AND tenant_id = :t FOR UPDATE"
+        ),
         {"id": conversation_id, "t": tenant_id},
-    ).scalar()
-    if status is None:  # unknown, or another store's conversation (RLS hides it)
+    ).first()
+    if row is None:  # unknown, or another store's conversation (RLS hides it)
         raise HTTPException(status_code=404, detail="conversation not found")
     history = [
         {"role": row.role, "content": row.content}
@@ -72,7 +102,7 @@ def _load_conversation(
             {"id": conversation_id},
         )
     ]
-    return conversation_id, str(status), history
+    return conversation_id, str(row.status), history, set(row.verified_orders), row.verify_attempts
 
 
 def _save_turn(
@@ -82,6 +112,7 @@ def _save_turn(
     turn: int,
     new_messages: list[dict[str, Any]],
     result: TurnResult,
+    ctx: ToolContext,
 ) -> None:
     for message in new_messages:
         conn.execute(
@@ -121,9 +152,12 @@ def _save_turn(
     conn.execute(
         text(
             "UPDATE conversations SET status = :status, handoff_reason = :reason, "
-            "updated_at = now() WHERE id = :id"
+            "verified_orders = :verified, verify_attempts = :attempts, updated_at = now() "
+            "WHERE id = :id"
         ),
         {
+            "verified": sorted(ctx.verified_orders),
+            "attempts": ctx.verify_attempts,
             "status": "handoff" if result.handoff else "open",
             "reason": None if not result.handoff else "agent handoff",
             "id": conversation_id,
@@ -137,16 +171,31 @@ def chat(
     tenant_id: Annotated[uuid.UUID, Depends(tenant_from_token)],
     model: Annotated[Model, Depends(model_dependency)],
     embedder: Annotated[Embedder, Depends(get_embedder)],
+    make_orders: Annotated[Any, Depends(order_source_factory)],
 ) -> ChatResponse:
     with tenant_connection(get_engine(), tenant_id) as conn:
-        conversation_id, status, history = _load_conversation(conn, tenant_id, body.conversation_id)
+        conversation_id, status, history, verified, attempts = _load_conversation(
+            conn, tenant_id, body.conversation_id
+        )
         if status == "handoff":
             return ChatResponse(
                 conversation_id=conversation_id, reply=HANDOFF_MESSAGE, citations=[], handoff=True
             )
-        result = run_turn(model, ToolContext(conn, embedder), history, body.message)
+        orders: OrderSource = make_orders(tenant_id)
+        ctx = ToolContext(
+            conn,
+            embedder,
+            orders=orders,
+            conversation_id=conversation_id,
+            tenant_id=tenant_id,
+            verified_orders=verified,
+            verify_attempts=attempts,
+        )
+        result = run_turn(model, ctx, history, body.message)
         turn = sum(1 for m in history if m["role"] == "user" and isinstance(m["content"], str))
-        _save_turn(conn, tenant_id, conversation_id, turn, result.messages[len(history) :], result)
+        _save_turn(
+            conn, tenant_id, conversation_id, turn, result.messages[len(history) :], result, ctx
+        )
     logger.info(
         "chat.turn",
         extra={"conversation_id": str(conversation_id), "tools": result.tool_calls},
