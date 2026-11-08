@@ -3,6 +3,7 @@
 import json
 import logging
 import uuid
+from decimal import Decimal
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException
@@ -114,6 +115,7 @@ def _save_turn(
     new_messages: list[dict[str, Any]],
     result: TurnResult,
     ctx: ToolContext,
+    reason: str = "agent handoff",
 ) -> None:
     for message in new_messages:
         conn.execute(
@@ -160,10 +162,41 @@ def _save_turn(
             "verified": sorted(ctx.verified_orders),
             "attempts": ctx.verify_attempts,
             "status": "handoff" if result.handoff else "open",
-            "reason": None if not result.handoff else "agent handoff",
+            "reason": None if not result.handoff else reason,
             "id": conversation_id,
         },
     )
+
+
+def _over_limit(conn: Connection, tenant_id: uuid.UUID, conversation_id: uuid.UUID) -> str | None:
+    """Name the spend limit this message would exceed, if any (architecture.md, agent loop)."""
+    settings = get_settings()
+    if settings.conversation_token_budget:
+        used = conn.execute(
+            text(
+                "SELECT coalesce(sum(input_tokens + output_tokens), 0) FROM traces "
+                "WHERE conversation_id = :c"
+            ),
+            {"c": conversation_id},
+        ).scalar_one()
+        if used >= settings.conversation_token_budget:
+            return "conversation token budget reached"
+    if settings.tenant_monthly_cost_cap_usd:
+        tokens_in, tokens_out = conn.execute(
+            text(
+                "SELECT coalesce(sum(input_tokens), 0), coalesce(sum(output_tokens), 0) "
+                "FROM traces WHERE tenant_id = :t "
+                "AND created_at >= date_trunc('month', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'"
+            ),
+            {"t": tenant_id},
+        ).one()
+        spent = (
+            tokens_in * settings.agent_input_usd_per_mtok
+            + tokens_out * settings.agent_output_usd_per_mtok
+        ) / Decimal(1_000_000)
+        if spent >= settings.tenant_monthly_cost_cap_usd:
+            return "monthly cost cap reached"
+    return None
 
 
 class SessionRequest(BaseModel):
@@ -210,6 +243,21 @@ def chat(
             conn, tenant_id, body.conversation_id
         )
         if status == "handoff":
+            return ChatResponse(
+                conversation_id=conversation_id, reply=HANDOFF_MESSAGE, citations=[], handoff=True
+            )
+        limit = _over_limit(conn, tenant_id, conversation_id)
+        if limit is not None:
+            logger.warning("chat.limit", extra={"tenant_id": str(tenant_id), "limit": limit})
+            reply = [{"type": "text", "text": HANDOFF_MESSAGE}]
+            new: list[dict[str, Any]] = [
+                {"role": "user", "content": body.message},
+                {"role": "assistant", "content": reply},
+            ]
+            turn = sum(1 for m in history if m["role"] == "user" and isinstance(m["content"], str))
+            ctx = ToolContext(conn, embedder, verified_orders=verified, verify_attempts=attempts)
+            result = TurnResult(text=HANDOFF_MESSAGE, handoff=True)
+            _save_turn(conn, tenant_id, conversation_id, turn, new, result, ctx, limit)
             return ChatResponse(
                 conversation_id=conversation_id, reply=HANDOFF_MESSAGE, citations=[], handoff=True
             )

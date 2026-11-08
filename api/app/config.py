@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     # Set these from Anthropic's current pricing page; at 0 the dashboard shows tokens only.
     agent_input_usd_per_mtok: Decimal = Decimal("0")
     agent_output_usd_per_mtok: Decimal = Decimal("0")
+    # Abuse and spend limits; 0 turns a limit off. Over either one, the chat endpoint hands
+    # the shopper to a person without calling the model. The monthly cap needs the prices above.
+    conversation_token_budget: int = 0
+    tenant_monthly_cost_cap_usd: Decimal = Decimal("0")
 
 
 @lru_cache

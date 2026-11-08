@@ -142,3 +142,60 @@ def test_an_installed_shop_gets_a_widget_token_for_its_own_store(
     assert response.status_code == 200
     assert tokens.verify(response.json()["token"], SECRET) == tenants[0]
     assert unknown.status_code == invalid.status_code == 404
+
+
+def test_a_conversation_over_its_token_budget_is_handed_off_without_a_model_call(
+    client: TestClient,
+    model: EchoModel,
+    admin_engine: Engine,
+    monkeypatch: pytest.MonkeyPatch,
+    tenants: tuple[uuid.UUID, uuid.UUID],
+) -> None:
+    monkeypatch.setenv("CONVERSATION_TOKEN_BUDGET", "10")
+    get_settings.cache_clear()
+    first = client.post("/v1/chat", headers=auth(tenants[0]), json={"message": "hello"})
+    conversation_id = first.json()["conversation_id"]
+    over = client.post(
+        "/v1/chat",
+        headers=auth(tenants[0]),
+        json={"message": "again", "conversation_id": conversation_id},
+    )
+    fresh = client.post("/v1/chat", headers=auth(tenants[0]), json={"message": "new chat"})
+
+    assert first.json()["handoff"] is False
+    assert over.json()["handoff"] is True
+    assert fresh.json()["handoff"] is False
+    assert len(model.history_sizes) == 2
+    with admin_engine.connect() as conn:
+        reason = conn.execute(
+            text("SELECT handoff_reason FROM conversations WHERE id = :id"),
+            {"id": conversation_id},
+        ).scalar()
+        stored = conn.execute(
+            text("SELECT count(*) FROM messages WHERE conversation_id = :id"),
+            {"id": conversation_id},
+        ).scalar()
+    assert reason == "conversation token budget reached"
+    assert stored == 4
+
+
+def test_a_store_over_its_monthly_cost_cap_stops_calling_the_model(
+    client: TestClient,
+    model: EchoModel,
+    monkeypatch: pytest.MonkeyPatch,
+    tenants: tuple[uuid.UUID, uuid.UUID],
+) -> None:
+    # 7 input + 3 output tokens at 100k USD per million tokens = 1.00 USD per message.
+    monkeypatch.setenv("AGENT_INPUT_USD_PER_MTOK", "100000")
+    monkeypatch.setenv("AGENT_OUTPUT_USD_PER_MTOK", "100000")
+    monkeypatch.setenv("TENANT_MONTHLY_COST_CAP_USD", "1.50")
+    get_settings.cache_clear()
+    replies = [
+        client.post("/v1/chat", headers=auth(tenants[0]), json={"message": "hi"}).json()
+        for _ in range(3)
+    ]
+    other_store = client.post("/v1/chat", headers=auth(tenants[1]), json={"message": "hi"})
+
+    assert [r["handoff"] for r in replies] == [False, False, True]
+    assert other_store.json()["handoff"] is False
+    assert len(model.history_sizes) == 3
