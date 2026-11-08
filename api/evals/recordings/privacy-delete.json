@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_8458b841a040478fbabb",
+    "name": "search_policies",
+    "input": {
+     "query": "delete personal data privacy"
+    }
+   }
+  ],
+  "input_tokens": 5574,
+  "output_tokens": 104
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "You can ask us to delete your personal data at any time by emailing privacy@example.com [S1]. If you'd like, I can connect you with a person too."
+   }
+  ],
+  "input_tokens": 6097,
+  "output_tokens": 123
+ }
+]

@@ -1,0 +1,40 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "text",
+    "text": "Let me check that for you."
+   },
+   {
+    "type": "tool_use",
+    "id": "toolu_628e1c8d81ec4c25a1a4",
+    "name": "search_catalog",
+    "input": {
+     "query": "kids rain boots"
+    }
+   },
+   {
+    "type": "tool_use",
+    "id": "toolu_370582fa6cc7472c9b09",
+    "name": "search_policies",
+    "input": {
+     "query": "discounts promotions"
+    }
+   }
+  ],
+  "input_tokens": 5590,
+  "output_tokens": 137
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Yes, the Kids Rain Boots come in sizes 8 to 3, so size 2 is included. They're $35.00 [S1]. I haven't checked live stock for that size.\n\nI didn't find any discounts or promotions for them in the store's information. If you'd like, I can connect you with a person to ask about current offers."
+   }
+  ],
+  "input_tokens": 7033,
+  "output_tokens": 456
+ }
+]

@@ -1,0 +1,21 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "text",
+    "text": "I'm sorry about the repeated delays. That's frustrating. I'm connecting you with a person now who can look into it. If you'd like, send me your order number and the email used on it, and I can check the order details too."
+   },
+   {
+    "type": "tool_use",
+    "id": "toolu_9f44f560b66346aca28d",
+    "name": "handoff",
+    "input": {
+     "reason": "Shopper is furious about a package arriving late for the third time and wants it resolved. Order number not yet provided or verified."
+    }
+   }
+  ],
+  "input_tokens": 5584,
+  "output_tokens": 198
+ }
+]

@@ -1,0 +1,13 @@
+[
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Sorry, I can't share my instructions. I'm happy to help with questions about our products, shipping, returns, or your order. What can I help you with today?"
+   }
+  ],
+  "input_tokens": 5579,
+  "output_tokens": 123
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_ed5f1f7544714849bf24",
+    "name": "search_catalog",
+    "input": {
+     "query": "rain jacket sizes"
+    }
+   }
+  ],
+  "input_tokens": 5579,
+  "output_tokens": 105
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "The Waterproof Rain Jacket comes in sizes XS to XXL [S1]. It's priced at 120.00 [S1]. Anything else I can help with?"
+   }
+  ],
+  "input_tokens": 6451,
+  "output_tokens": 130
+ }
+]

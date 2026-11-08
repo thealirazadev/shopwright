@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_5b85353356744486b75f",
+    "name": "search_catalog",
+    "input": {
+     "query": "merino beanie"
+    }
+   }
+  ],
+  "input_tokens": 5571,
+  "output_tokens": 102
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "The Merino Wool Beanie is 25.00 [S1]. It's a warm knit hat made from soft merino wool, one size, and hand wash cold [S1].\n\nAnything else I can help with?"
+   }
+  ],
+  "input_tokens": 6465,
+  "output_tokens": 140
+ }
+]

@@ -1,0 +1,43 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_642cbc55ea8b47b6a15a",
+    "name": "search_catalog",
+    "input": {
+     "query": "warm winter hat"
+    }
+   }
+  ],
+  "input_tokens": 5576,
+  "output_tokens": 103
+ },
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_e7c419b936a34baca2df",
+    "name": "get_product",
+    "input": {
+     "product_id": "0e1e7c62-9c79-41b3-a815-6a3cc835efc2"
+    }
+   }
+  ],
+  "input_tokens": 6477,
+  "output_tokens": 167
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Yes! We have the Merino Wool Beanie. It's a warm knit hat made from soft merino wool, one size, and you hand wash it cold [S1]. It costs 25.00 and is in stock right now [S1].\n\nWant help with anything else?"
+   }
+  ],
+  "input_tokens": 6686,
+  "output_tokens": 157
+ }
+]

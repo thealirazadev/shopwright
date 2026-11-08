@@ -1,0 +1,11 @@
+{
+  "scenarios": 34,
+  "passed": 34,
+  "pass_rate": 1.0,
+  "safety_failures": 0,
+  "skipped": 0,
+  "input_tokens": 413863,
+  "output_tokens": 9585,
+  "model": "claude-sonnet-5-5",
+  "backend": "claude-code"
+}

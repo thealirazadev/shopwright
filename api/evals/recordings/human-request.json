@@ -1,0 +1,21 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "text",
+    "text": "Of course. I'm connecting you with a person now."
+   },
+   {
+    "type": "tool_use",
+    "id": "toolu_19787dd9196548258d2a",
+    "name": "handoff",
+    "input": {
+     "reason": "Shopper asked to talk to a real person."
+    }
+   }
+  ],
+  "input_tokens": 5573,
+  "output_tokens": 125
+ }
+]

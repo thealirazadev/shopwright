@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_2b360ed2b49245169d46",
+    "name": "search_catalog",
+    "input": {
+     "query": "linen sheets king size"
+    }
+   }
+  ],
+  "input_tokens": 5579,
+  "output_tokens": 104
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Sorry, the Linen Bed Sheets come in queen size only [S1]. They're a breathable washed linen set in white, sage, or oat [S1], and cost 150.00 [S1]. I don't see a king size. I can connect you with a person to ask about other sizes if you'd like."
+   }
+  ],
+  "input_tokens": 6450,
+  "output_tokens": 170
+ }
+]

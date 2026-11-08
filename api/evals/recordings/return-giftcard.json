@@ -1,0 +1,36 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_087370980ab64c4fbc28",
+    "name": "search_policies",
+    "input": {
+     "query": "gift card refund"
+    }
+   },
+   {
+    "type": "tool_use",
+    "id": "toolu_2bb95f860960438bad9c",
+    "name": "search_catalog",
+    "input": {
+     "query": "gift card"
+    }
+   }
+  ],
+  "input_tokens": 5578,
+  "output_tokens": 125
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Sorry, but no. Gift cards are final sale [S1]. The Gift Card product page also says it can't be refunded [S5]. It's a $50.00 digital card delivered by email, and it never expires [S5].\n\nIf you'd like, I can connect you with a person to talk it over."
+   }
+  ],
+  "input_tokens": 6933,
+  "output_tokens": 167
+ }
+]

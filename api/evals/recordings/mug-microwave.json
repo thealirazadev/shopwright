@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_503e324928b049d1a06d",
+    "name": "search_catalog",
+    "input": {
+     "query": "coffee mug microwave safe"
+    }
+   }
+  ],
+  "input_tokens": 5585,
+  "output_tokens": 107
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Yes! The Ceramic Coffee Mug is listed as dishwasher and microwave safe. It holds 350 ml and costs 18.00 [S1]."
+   }
+  ],
+  "input_tokens": 6478,
+  "output_tokens": 129
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_897d6d57be514e30a9a8",
+    "name": "search_catalog",
+    "input": {
+     "query": "electric scooters"
+    }
+   }
+  ],
+  "input_tokens": 5573,
+  "output_tokens": 102
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "I couldn't find any electric scooters in our catalog. The search only returned unrelated items: a Bluetooth Speaker [S1], a Waterproof Rain Jacket [S2], Trail Running Shoes [S3], a Leather Wallet [S4], and a Ceramic Coffee Mug [S5]. I can connect you with a person to double-check, or help you look for something else."
+   }
+  ],
+  "input_tokens": 6471,
+  "output_tokens": 202
+ }
+]

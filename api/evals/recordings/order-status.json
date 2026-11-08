@@ -1,0 +1,13 @@
+[
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "I can help with that! To look up order #1042, please share the email address used on the order."
+   }
+  ],
+  "input_tokens": 5572,
+  "output_tokens": 100
+ }
+]

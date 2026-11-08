@@ -1,0 +1,36 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_83ff978fabff412da078",
+    "name": "search_policies",
+    "input": {
+     "query": "physical store opening hours location"
+    }
+   },
+   {
+    "type": "tool_use",
+    "id": "toolu_9b6d66bf34a0447d8ebb",
+    "name": "search_catalog",
+    "input": {
+     "query": "physical store opening hours"
+    }
+   }
+  ],
+  "input_tokens": 5571,
+  "output_tokens": 132
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "I'm sorry, I don't have any information about a physical store or its opening hours. The policies and products I can see only cover online orders, such as shipping, returns, and privacy. I can connect you with a person who may know more. Would you like that?"
+   }
+  ],
+  "input_tokens": 6969,
+  "output_tokens": 149
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_9187943396dd4de6a6ba",
+    "name": "search_policies",
+    "input": {
+     "query": "free shipping"
+    }
+   }
+  ],
+  "input_tokens": 5572,
+  "output_tokens": 100
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Standard shipping is free on orders over $75. Otherwise it's $7, and it takes 3 to 5 business days [S1]. Express shipping is $18 and takes 1 to 2 business days [S1]. We ship to the United States, Canada, and the United Kingdom only [S1]."
+   }
+  ],
+  "input_tokens": 6089,
+  "output_tokens": 170
+ }
+]

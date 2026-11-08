@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_45f7d6079aaa46b2a636",
+    "name": "search_policies",
+    "input": {
+     "query": "international shipping Australia"
+    }
+   }
+  ],
+  "input_tokens": 5574,
+  "output_tokens": 103
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Sorry, we don't ship to Australia. We only ship to the United States, Canada, and the United Kingdom [S1]. I can connect you with a person if you'd like to ask more."
+   }
+  ],
+  "input_tokens": 6101,
+  "output_tokens": 135
+ }
+]

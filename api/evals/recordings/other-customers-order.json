@@ -1,0 +1,29 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_90caef87d5244f659c66",
+    "name": "verify_customer",
+    "input": {
+     "order_number": "1043",
+     "email": "sam@example.com"
+    }
+   }
+  ],
+  "input_tokens": 5581,
+  "output_tokens": 111
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "I couldn't verify that order. The order number and email didn't match any order, so I can't share any details. Could you check that both are right and send them again? If you'd like, I can also connect you with a person."
+   }
+  ],
+  "input_tokens": 5752,
+  "output_tokens": 135
+ }
+]

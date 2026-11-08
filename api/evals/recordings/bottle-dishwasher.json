@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_e3e195723e8f4d3f8050",
+    "name": "search_catalog",
+    "input": {
+     "query": "water bottle dishwasher safe"
+    }
+   }
+  ],
+  "input_tokens": 5576,
+  "output_tokens": 108
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "No, the Stainless Water Bottle (750 ml, $32.00) is not dishwasher safe [S1]. It's best to wash it by hand. Anything else I can help with?"
+   }
+  ],
+  "input_tokens": 6509,
+  "output_tokens": 134
+ }
+]

@@ -1,0 +1,36 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_e8bd242222de49c6b2a3",
+    "name": "search_catalog",
+    "input": {
+     "query": "speaker warranty"
+    }
+   },
+   {
+    "type": "tool_use",
+    "id": "toolu_e37ad894414441e29f82",
+    "name": "search_policies",
+    "input": {
+     "query": "warranty"
+    }
+   }
+  ],
+  "input_tokens": 5574,
+  "output_tokens": 126
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "I couldn't find any warranty information for the Bluetooth Speaker. The product listing describes it as a portable speaker with a 12 hour battery that is water resistant (IPX5), not waterproof [S1]. None of the store policies I checked mention a warranty either. I don't want to guess, so I can connect you with a person who can confirm. Would you like that?"
+   }
+  ],
+  "input_tokens": 6931,
+  "output_tokens": 191
+ }
+]

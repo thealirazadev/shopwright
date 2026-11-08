@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_4053aa0fca4b4dc0a4b4",
+    "name": "search_catalog",
+    "input": {
+     "query": "speaker waterproof swimming water resistance"
+    }
+   }
+  ],
+  "input_tokens": 5575,
+  "output_tokens": 111
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Probably not for swimming. Our Bluetooth Speaker is water resistant (IPX5), but it is not waterproof [S1]. That means it's okay around splashes, but it isn't meant to be submerged. Would you like help with anything else?"
+   }
+  ],
+  "input_tokens": 6483,
+  "output_tokens": 155
+ }
+]

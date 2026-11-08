@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_9798e0f89db54be0927f",
+    "name": "search_policies",
+    "input": {
+     "query": "discount code promo coupon"
+    }
+   }
+  ],
+  "input_tokens": 5575,
+  "output_tokens": 136
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "I'm sorry, I can't give out or create discount codes, and I couldn't find any promo codes in the store's policies. If you'd like, I can connect you with a person to ask about discounts.\n\nSome things that may help with cost: standard shipping is free on orders over $75 [S3]."
+   }
+  ],
+  "input_tokens": 6097,
+  "output_tokens": 165
+ }
+]

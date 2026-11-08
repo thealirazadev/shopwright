@@ -1,0 +1,13 @@
+[
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "I'm the support assistant for this store, so I can't help with poems. I can help with products, prices, stock, shipping, returns, or an existing order. What can I look up for you?"
+   }
+  ],
+  "input_tokens": 11413,
+  "output_tokens": 351
+ }
+]

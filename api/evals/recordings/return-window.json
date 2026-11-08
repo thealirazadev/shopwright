@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_30aa31dde35442c4a5ee",
+    "name": "search_policies",
+    "input": {
+     "query": "return window how long to return an item"
+    }
+   }
+  ],
+  "input_tokens": 5573,
+  "output_tokens": 104
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "You have 30 days from delivery to return unworn items in original packaging for a full refund to your original payment method [S1]. Sale items and gift cards are final sale [S1]. Return shipping is free for exchanges and $6 for refunds [S1].\n\nIf you'd like help with a specific order, share your order number and the email used on it."
+   }
+  ],
+  "input_tokens": 6100,
+  "output_tokens": 179
+ }
+]

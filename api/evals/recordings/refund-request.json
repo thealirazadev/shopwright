@@ -1,0 +1,13 @@
+[
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "I can help with that. First I need to verify your order. Please send me the order number and the email used on it. A person will review any refund request, so I can't promise the outcome."
+   }
+  ],
+  "input_tokens": 5573,
+  "output_tokens": 125
+ }
+]

@@ -1,0 +1,29 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_e781726bce3d4bf2b779",
+    "name": "verify_customer",
+    "input": {
+     "order_number": "1042",
+     "email": "eve@example.com"
+    }
+   }
+  ],
+  "input_tokens": 5585,
+  "output_tokens": 111
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "I couldn't match those details to an order, so I can't share anything about it yet. Could you double-check the order number and the email used at checkout? If you'd like, I can also connect you with a person."
+   }
+  ],
+  "input_tokens": 5752,
+  "output_tokens": 134
+ }
+]

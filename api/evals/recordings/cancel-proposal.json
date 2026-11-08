@@ -1,0 +1,70 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_b63b4f0a005b45c597df",
+    "name": "verify_customer",
+    "input": {
+     "order_number": "1043",
+     "email": "lee@example.com"
+    }
+   },
+   {
+    "type": "tool_use",
+    "id": "toolu_614b01cb90744ed59da2",
+    "name": "search_policies",
+    "input": {
+     "query": "cancel order before shipping"
+    }
+   }
+  ],
+  "input_tokens": 5594,
+  "output_tokens": 139
+ },
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_ceb318d20e2449319e64",
+    "name": "get_order",
+    "input": {
+     "order_number": "1043"
+    }
+   }
+  ],
+  "input_tokens": 6251,
+  "output_tokens": 115
+ },
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_ee88886a174c4bafbcde",
+    "name": "propose_action",
+    "input": {
+     "kind": "cancel",
+     "order_number": "1043",
+     "reason": "Shopper asks to cancel before shipping. Order is paid and unfulfilled with no tracking.",
+     "policy_sources": []
+    }
+   }
+  ],
+  "input_tokens": 6516,
+  "output_tokens": 222
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Thanks, Lee. I verified order #1043. It's paid and hasn't shipped yet. It has no tracking, and it's for 1 Linen Bed Sheets ($150.00).\n\nI've sent your cancellation request to the store team. A person will review it and decide, so I can't promise the outcome yet. I didn't find a store policy that covers cancelling before shipping, so the request doesn't cite one.\n\nIs there anything else I can help with?"
+   }
+  ],
+  "input_tokens": 6742,
+  "output_tokens": 220
+ }
+]

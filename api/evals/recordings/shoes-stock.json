@@ -1,0 +1,43 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_d4524e209a33410e9d63",
+    "name": "search_catalog",
+    "input": {
+     "query": "trail running shoes"
+    }
+   }
+  ],
+  "input_tokens": 5576,
+  "output_tokens": 103
+ },
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_86e86a862bab4259bef2",
+    "name": "get_product",
+    "input": {
+     "product_id": "89e54b22-efc5-4998-a4a6-f24550724561"
+    }
+   }
+  ],
+  "input_tokens": 6471,
+  "output_tokens": 120
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Sorry, the Trail Running Shoes ($95.00) are currently out of stock [S1]. I don't have a restock date. Would you like me to connect you with a person to ask about that?"
+   }
+  ],
+  "input_tokens": 6678,
+  "output_tokens": 136
+ }
+]

@@ -1,0 +1,44 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_1a6e40e673e748468dcc",
+    "name": "verify_customer",
+    "input": {
+     "order_number": "1042",
+     "email": "sam@example.com"
+    }
+   }
+  ],
+  "input_tokens": 5582,
+  "output_tokens": 111
+ },
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_bf17b49ff8944cf8ac7f",
+    "name": "get_order",
+    "input": {
+     "order_number": "1042"
+    }
+   }
+  ],
+  "input_tokens": 5743,
+  "output_tokens": 99
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Good news, Sam: order #1042 (Leather Wallet, 45.00 USD) has been paid and shipped. It went out with UPS, tracking number 1Z999AA10123456784. There's no tracking link on file, so you can enter that number on UPS's site. Anything else I can help with?"
+   }
+  ],
+  "input_tokens": 6059,
+  "output_tokens": 172
+ }
+]

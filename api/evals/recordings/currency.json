@@ -1,0 +1,36 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_8a04826cfb4c48ca972c",
+    "name": "search_policies",
+    "input": {
+     "query": "currency prices"
+    }
+   },
+   {
+    "type": "tool_use",
+    "id": "toolu_b82b31c0c7f445549392",
+    "name": "search_catalog",
+    "input": {
+     "query": "price currency"
+    }
+   }
+  ],
+  "input_tokens": 5577,
+  "output_tokens": 124
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "Our prices are in US dollars [S1]."
+   }
+  ],
+  "input_tokens": 6907,
+  "output_tokens": 90
+ }
+]

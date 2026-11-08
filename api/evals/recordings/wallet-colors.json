@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_c7e7a8cf41ac436fb77b",
+    "name": "search_catalog",
+    "input": {
+     "query": "leather wallet colors"
+    }
+   }
+  ],
+  "input_tokens": 5576,
+  "output_tokens": 104
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "The Leather Wallet comes in black and tan [S1]. It's a slim bifold with six card slots, priced at 45.00 [S1]. Want me to check anything else?"
+   }
+  ],
+  "input_tokens": 6471,
+  "output_tokens": 132
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "stop_reason": "tool_use",
+  "content": [
+   {
+    "type": "tool_use",
+    "id": "toolu_a805a91290134dacac30",
+    "name": "search_catalog",
+    "input": {
+     "query": "ceramic coffee mug"
+    }
+   }
+  ],
+  "input_tokens": 5582,
+  "output_tokens": 106
+ },
+ {
+  "stop_reason": "end_turn",
+  "content": [
+   {
+    "type": "text",
+    "text": "The Ceramic Coffee Mug costs 18.00 and holds 350 ml. It's dishwasher and microwave safe [S1]. I can check stock or help with something else if you'd like."
+   }
+  ],
+  "input_tokens": 13135,
+  "output_tokens": 286
+ }
+]
