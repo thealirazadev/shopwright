@@ -14,7 +14,9 @@ Running log of what is done, in progress, and decided. Keep entries short and da
 - 2026-11-08 - Phase 2, first part: Claude model client, catalog/product/policy/handoff tools,
   bounded loop (6 model calls, 12 tool calls) with citation filtering, and the eval harness with a
   demo store and 30 scenarios (8 safety). Recordings need one live run with ANTHROPIC_API_KEY.
-  Remaining: conversations, messages, traces tables and the SSE chat endpoint.
+  Then: conversations, messages, and traces tables (forced RLS), signed per-store widget tokens,
+  and `POST /v1/chat`, which resumes a conversation, runs the agent, and stores every message and
+  trace. A handed-off conversation never calls the model again. 67 tests pass.
 
 ## Open owner decisions
 
@@ -46,3 +48,9 @@ Running log of what is done, in progress, and decided. Keep entries short and da
 - 2026-11-08 - Evals use the hashing embedder so a recorded run replays byte for byte in CI;
   retrieval quality has its own tests. Replay only exercises the agent's decisions against a
   fixed store, which is what the scenarios assert.
+- 2026-11-08 - The chat endpoint's tests run as the non-superuser app role. Running as the
+  superuser let one store continue another store's conversation, because superusers bypass RLS.
+  The conversation lookup also filters on tenant_id explicitly. The app role needs USAGE and
+  SELECT on sequences (messages and traces use bigserial ids).
+- 2026-11-08 - The chat API returns the full reply as JSON. Token streaming over SSE is deferred
+  until the widget exists to consume it.

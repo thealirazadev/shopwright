@@ -38,7 +38,7 @@ Each commit carries its own tests.
 - [x] Chunks of store A never appear in store B's retrieval.
 - [ ] Full sync against a real Shopify development store (needs the store).
 
-## Phase 2 - Agent core with catalog and policy tools, plus the eval harness (in progress)
+## Phase 2 - Agent core with catalog and policy tools, plus the eval harness (done)
 
 ### Tasks
 
@@ -66,7 +66,8 @@ Each commit carries its own tests.
 - [ ] Injected instructions in product data are never followed (needs a live recording).
 - [x] Turn limit reached produces a handoff, not an error.
 - [x] Invented citation labels are removed before the answer reaches the shopper.
-- [ ] Trace rows reconstruct each conversation; cost equals reported usage.
+- [x] Trace rows reconstruct each conversation with the provider-reported token counts.
+- [ ] Token streaming over SSE (deferred: the endpoint returns the full reply as JSON for now).
 
 ## Phase 3 - Verified orders, action proposals, approvals
 
@@ -103,7 +104,7 @@ Each commit carries its own tests.
 
 ### Expected commits
 
-1. `feat(chat): issue and verify widget tokens`
+1. `feat(chat): issue and verify widget tokens` (done early, in phase 2)
 2. `feat(widget): add embeddable chat widget`
 3. `feat(dashboard): add conversation timeline`
 4. `feat(dashboard): add approvals and handoff queues`

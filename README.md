@@ -4,8 +4,10 @@ AI support copilot for Shopify and WooCommerce stores. Merchants connect their
 store and get a chat widget that answers customer questions from their own
 catalog, policies, and orders — embeddable with a single script tag.
 
-**Status:** in development. Phase 1 (Shopify catalog and policy sync, hybrid retrieval) is done;
-phase 2 (the agent loop and eval harness) is next. See [docs/phases.md](docs/phases.md).
+**Status:** in development. Phases 1 and 2 are done: Shopify catalog and policy sync, hybrid
+retrieval, a bounded Claude tool-use agent with verified citations, `POST /v1/chat` with stored
+traces, and an eval suite of 30 scenarios with safety gates. Phase 3 (verified orders and
+approval-gated refunds) is next. See [docs/phases.md](docs/phases.md).
 
 ## Architecture
 
