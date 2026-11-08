@@ -24,7 +24,7 @@ from app.agent.loop import TurnResult, run_turn
 from app.agent.model import Model, ModelReply, get_model
 from app.agent.tools import ToolContext
 from app.config import get_settings
-from app.connectors.shopify.client import PolicyDoc, ProductDoc
+from app.connectors.shopify.client import OrderDoc, PolicyDoc, ProductDoc
 from app.db import tenant_connection
 from app.ingest.sync import upsert_policy, upsert_product
 from app.rag.embedder import HashingEmbedder
@@ -58,6 +58,28 @@ class ReplayModel:
         if not self.replies:
             raise AssertionError("recording ran out of replies: re-record with --live")
         return ModelReply(**self.replies.pop(0))
+
+
+class EvalOrders:
+    def __init__(self, orders: list[dict[str, Any]]) -> None:
+        self._orders = {o["number"]: o for o in orders}
+
+    def find_order(self, order_number: str) -> OrderDoc | None:
+        o = self._orders.get(order_number)
+        if o is None:
+            return None
+        return OrderDoc(
+            external_id=f"gid://shopify/Order/{o['number']}",
+            number=o["number"],
+            email=o["email"],
+            created_at="2026-11-01T10:00:00Z",
+            financial_status=o["financial_status"],
+            fulfillment_status=o["fulfillment_status"],
+            total=o["total"],
+            currency="USD",
+            items=o["items"],
+            tracking=o["tracking"],
+        )
 
 
 @dataclass
@@ -100,6 +122,9 @@ def check(scenario: dict[str, Any], result: TurnResult) -> list[str]:
     for tool in scenario.get("expect_tools", []):
         if tool not in result.tool_calls:
             failures.append(f"expected tool {tool}, called {result.tool_calls}")
+    for tool in scenario.get("forbid_tools", []):
+        if tool in result.tool_calls:
+            failures.append(f"forbidden tool {tool} was called")
     cited = {c["title"] for c in result.citations}
     for title in scenario.get("expect_cited", []):
         if title not in cited:
@@ -127,6 +152,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     engine = create_engine(get_settings().database_url)
     tenant_id = seed_store(engine)
+    orders = EvalOrders(json.loads((HERE / "store.json").read_text()).get("orders", []))
     outcomes: list[Outcome] = []
     skipped = 0
     for scenario in scenarios:
@@ -140,7 +166,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             skipped += 1
             continue
         with tenant_connection(engine, tenant_id) as conn:
-            result = run_turn(model, ToolContext(conn, HashingEmbedder()), [], scenario["message"])
+            conversation_id = conn.execute(
+                text("INSERT INTO conversations (tenant_id) VALUES (:t) RETURNING id"),
+                {"t": tenant_id},
+            ).scalar_one()
+            ctx = ToolContext(
+                conn,
+                HashingEmbedder(),
+                orders=orders,
+                conversation_id=conversation_id,
+                tenant_id=tenant_id,
+            )
+            result = run_turn(model, ctx, [], scenario["message"])
         if isinstance(model, RecordingModel):
             path.write_text(json.dumps(model.replies, indent=1) + "\n")
         outcomes.append(Outcome(scenario, check(scenario, result), result))
