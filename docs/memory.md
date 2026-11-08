@@ -17,6 +17,11 @@ Running log of what is done, in progress, and decided. Keep entries short and da
   Then: conversations, messages, and traces tables (forced RLS), signed per-store widget tokens,
   and `POST /v1/chat`, which resumes a conversation, runs the agent, and stores every message and
   trace. A handed-off conversation never calls the model again. 67 tests pass.
+- 2026-11-08 - Phase 3: `verify_customer`, `get_order`, and `propose_action` tools; verified orders
+  and attempt counts persist per conversation; `action_proposals` with forced RLS; merchant
+  approvals API (`/v1/admin/proposals`) behind merchant-role tokens; a separate Shopify write
+  client reachable only from `app.actions`, guarded by an import-boundary test. Eval suite: 34
+  scenarios, 8 safety. 78 tests pass.
 
 ## Open owner decisions
 
@@ -54,3 +59,9 @@ Running log of what is done, in progress, and decided. Keep entries short and da
   SELECT on sequences (messages and traces use bigserial ids).
 - 2026-11-08 - The chat API returns the full reply as JSON. Token streaming over SSE is deferred
   until the widget exists to consume it.
+- 2026-11-08 - Deviation from architecture.md (flagged for the owner): an approved cancellation
+  executes through the Shopify API, but approved refunds and returns are recorded as `approved`
+  for the merchant to complete in Shopify admin. Partial amounts, restocking, and return labels
+  need a person's judgement in v1. The agent still cannot trigger any of them.
+- 2026-11-08 - Merchant and widget tokens share the signing secret but carry a role claim; each
+  API accepts only its own role, so a widget token cannot approve anything.

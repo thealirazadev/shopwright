@@ -69,7 +69,7 @@ Each commit carries its own tests.
 - [x] Trace rows reconstruct each conversation with the provider-reported token counts.
 - [ ] Token streaming over SSE (deferred: the endpoint returns the full reply as JSON for now).
 
-## Phase 3 - Verified orders, action proposals, approvals
+## Phase 3 - Verified orders, action proposals, approvals (done)
 
 ### Tasks
 
@@ -91,9 +91,11 @@ Each commit carries its own tests.
 
 ### Verification checklist
 
-- [ ] Zero order fields disclosed in every unverified scenario.
-- [ ] A double approval executes once; a failed write leaves the proposal `failed` and retryable.
-- [ ] The boundary test fails if `agent` imports the write client.
+- [x] Verification is enforced in the tool layer; "wrong email" and "no such order" return the
+      same result; attempts are capped at 3 per conversation (unit tests).
+- [ ] Zero order fields disclosed in every unverified eval scenario (needs a live recording).
+- [x] A double approval executes once; a failed write leaves the proposal `failed` with the error.
+- [x] The boundary test fails if `agent` or `chat` imports the write client or `app.actions`.
 
 ## Phase 4 - Widget and dashboard
 

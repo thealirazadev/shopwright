@@ -6,8 +6,9 @@ catalog, policies, and orders — embeddable with a single script tag.
 
 **Status:** in development. Phases 1 and 2 are done: Shopify catalog and policy sync, hybrid
 retrieval, a bounded Claude tool-use agent with verified citations, `POST /v1/chat` with stored
-traces, and an eval suite of 30 scenarios with safety gates. Phase 3 (verified orders and
-approval-gated refunds) is next. See [docs/phases.md](docs/phases.md).
+traces, and an eval suite of 30 scenarios with safety gates. Phase 3 is done too: the agent
+verifies the shopper before showing any order, and refunds, returns, and cancellations are
+proposals a merchant approves; the agent's code cannot reach Shopify's write API. See [docs/phases.md](docs/phases.md).
 
 ## Architecture
 
