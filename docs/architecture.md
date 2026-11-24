@@ -98,8 +98,8 @@ idempotency key derived from the proposal id, so a retried approval cannot refun
 - Hybrid query: pgvector cosine similarity plus Postgres full-text rank, merged with reciprocal
   rank fusion. Product availability comes from `get_product` at answer time, never from stale
   chunks.
-- Embeddings go through an `Embedder` interface. Production uses a hosted embedding API (provider
-  choice is an owner decision, logged in memory); tests use a deterministic fake.
+- Embeddings go through an `Embedder` interface. Production uses Voyage AI over httpx (see
+  [decisions](decisions.md#6-voyage-ai-embeddings-over-plain-http)); tests use a deterministic fake.
 
 ## Traces
 
@@ -125,12 +125,13 @@ provider-reported usage. The dashboard renders a conversation as a timeline from
 | Model API error or timeout | One retry with backoff, then a handoff message; trace records the error |
 | Shopify API error on a read tool | `is_error` tool result; the model tells the shopper it cannot check right now |
 | Shopify error on an approved action | Proposal `failed` with the error; merchant sees it and can retry with the same idempotency key |
-| Embedding API down during sync | Source row saved, chunk marked stale, retried by the queue; retrieval skips stale chunks |
+| Embedding API down during sync | Source row and chunks saved with a NULL vector; full-text search still finds them and `embed_missing` fills the vectors later |
 | Tenant over cost cap | No model call; handoff message |
 | Missing tenant context | RLS returns nothing (fail closed); request errors, never another tenant's data |
 
 ## Tech stack with rationale
 
 Existing: FastAPI, SQLAlchemy, Alembic, Postgres with pgvector, Redis, React and TypeScript
-dashboard, vanilla TypeScript widget. Added: the Anthropic Python SDK for the agent (tool use
-and streaming), and one embedding client. Any new dependency needs owner approval first.
+dashboard, vanilla TypeScript widget. Added: the Anthropic Python SDK for the agent (tool use).
+Voyage AI embeddings are called over httpx, so no embedding SDK is added. New dependencies are
+kept to a minimum.
