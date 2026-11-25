@@ -25,7 +25,10 @@ and return labels need a person's judgement. In both cases the agent cannot trig
 `verify_customer` checks the order number against the email on the order in the tool layer, and
 returns the same result for "no such order" and "wrong email", so the agent cannot be used to
 probe which orders exist. Attempts are capped at 3 per conversation, and the verified orders and
-attempt counts persist with the conversation. The tenant and the set of verified orders come from
+attempt counts persist with the conversation. An order with no email on it (a POS or draft order)
+never verifies, since an empty email would otherwise match an empty answer, and an order lookup
+only returns the order whose number was asked for, never a near match from Shopify's search. The
+tenant and the set of verified orders come from
 server state, never from tool input; tool schemas are strict (`additionalProperties: false`, all
 fields required).
 
@@ -45,7 +48,9 @@ Past either limit the shopper is handed to a person, with a handoff reason that 
 instead of receiving an error. Both limits default to 0 (off). Model prices
 (`AGENT_*_USD_PER_MTOK`) are configuration rather than constants so they can track the provider's
 published pricing; the monthly cap is computed from them, so it only takes effect once they are
-set.
+set. Every input token counts toward both limits, including prompt-cache writes and reads, which
+the API reports separately from `input_tokens`. Cache reads are billed below the input price, so
+the cost estimate errs high when the cache hits, and the cap trips early rather than late.
 
 ## 6. Voyage AI embeddings over plain HTTP
 
@@ -106,7 +111,8 @@ Evals use the hashing embedder so a recorded run replays byte for byte in CI; re
 has its own tests, and replay exercises the agent's decisions against a fixed store, which is
 what the scenarios assert. Recordings can also be made through `claude -p` with structured
 output, so the suite runs without an API key; this is eval-only code, and results state which
-backend recorded them. The first live run scored 28 of 34 and exposed two prompt problems: the
+backend recorded them. Once any recording exists, a scenario without one fails the replay instead
+of being skipped, so the gate always covers every scenario. The first live run scored 28 of 34 and exposed two prompt problems: the
 agent repeated an injected instruction while saying it ignored it, and its wording ("that the
 policy allows") made it hand off verified cancellation requests that the store's policies did
 not mention. The prompt now turns a verified refund, return, or cancellation request into a

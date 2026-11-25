@@ -49,6 +49,33 @@ def test_a_reply_keeps_blocks_usage_and_caches_the_system_prompt() -> None:
     assert sent[0]["model"] == "claude-sonnet-5-5"
 
 
+def test_input_tokens_include_cache_writes_and_reads() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "id": "msg_2",
+                "type": "message",
+                "role": "assistant",
+                "model": "claude-sonnet-5-5",
+                "stop_reason": "end_turn",
+                "content": [{"type": "text", "text": "Hi"}],
+                "usage": {
+                    "input_tokens": 20,
+                    "cache_creation_input_tokens": 1500,
+                    "cache_read_input_tokens": 3000,
+                    "output_tokens": 5,
+                },
+            },
+        )
+
+    reply = claude_with(httpx.MockTransport(handler)).create(
+        "system", [{"role": "user", "content": "hi"}], []
+    )
+
+    assert (reply.input_tokens, reply.output_tokens) == (4520, 5)
+
+
 def test_an_api_error_becomes_a_model_error() -> None:
     handler = httpx.MockTransport(
         lambda r: httpx.Response(529, json={"type": "error", "error": {"type": "overloaded"}})

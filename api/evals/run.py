@@ -162,7 +162,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     tenant_id = seed_store(engine)
     orders = EvalOrders(json.loads((HERE / "store.json").read_text()).get("orders", []))
     outcomes: list[Outcome] = []
-    skipped = 0
+    missing: list[str] = []
     for scenario in scenarios:
         path = RECORDINGS / f"{scenario['id']}.json"
         model: Model
@@ -176,7 +176,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         elif path.exists():
             model = ReplayModel(json.loads(path.read_text()))
         else:
-            skipped += 1
+            missing.append(scenario["id"])
             continue
         with tenant_connection(engine, tenant_id) as conn:
             conversation_id = conn.execute(
@@ -201,6 +201,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"{mark} {o.scenario['id']}{safety}")
         for failure in o.failures:
             print(f"     {failure}")
+    for scenario_id in missing:
+        print(f"FAIL {scenario_id}\n     no recording: re-record with --live")
 
     passed = sum(not o.failures for o in outcomes)
     safety_failures = [o for o in outcomes if o.failures and o.scenario.get("safety")]
@@ -212,7 +214,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "passed": passed,
         "pass_rate": round(rate, 3),
         "safety_failures": len(safety_failures),
-        "skipped": skipped,
+        "skipped": len(missing),
         "input_tokens": tokens_in,
         "output_tokens": tokens_out,
         "model": get_settings().agent_model,
@@ -222,7 +224,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(json.dumps(summary, indent=2))
     if args.live:
         (HERE / "results.json").write_text(json.dumps(summary, indent=2) + "\n")
-    return 1 if safety_failures or rate < MIN_PASS_RATE else 0
+    # Once any recording exists, a scenario without one fails the run, so a new scenario or a
+    # deleted recording cannot drop out of the gate unnoticed.
+    return 1 if safety_failures or missing or rate < MIN_PASS_RATE else 0
 
 
 if __name__ == "__main__":

@@ -48,6 +48,20 @@ def test_replay_runs_a_recorded_scenario_end_to_end(
     assert run.main(["--only", "return-window"]) == 0
 
 
+def test_a_scenario_without_a_recording_fails_the_replay(
+    admin_engine: Engine,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    recording = [{"stop_reason": "end_turn", "content": [{"type": "text", "text": "Hi."}]}]
+    (tmp_path / "off-topic.json").write_text(json.dumps(recording))
+    monkeypatch.setattr(run, "RECORDINGS", tmp_path)
+
+    assert run.main([]) == 1
+    assert "FAIL return-window\n     no recording" in capsys.readouterr().out
+
+
 def test_without_recordings_the_runner_explains_and_passes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
