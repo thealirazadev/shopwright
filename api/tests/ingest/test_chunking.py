@@ -24,3 +24,9 @@ def test_a_long_paragraph_is_split_on_spaces() -> None:
 
     assert all(len(chunk) <= 60 for chunk in chunks)
     assert all(not chunk.endswith("wor") for chunk in chunks)
+
+
+def test_a_word_longer_than_the_limit_is_cut_hard_after_flushing_the_pending_chunk() -> None:
+    chunks = split_text("short\n\n" + "x" * 25, max_chars=10)
+
+    assert chunks == ["short", "x" * 10, "x" * 10, "x" * 5]
