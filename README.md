@@ -4,7 +4,7 @@ AI support copilot for Shopify stores. Merchants connect their store and get a c
 answers customer questions from their own catalog, policies, and orders, embeddable with a single
 script tag. A WooCommerce plugin is planned.
 
-**Status:** phases 1 to 4 are done.
+**Status:** the Shopify connector, agent, evals, widget, and dashboard are built:
 
 - Shopify catalog and policy sync, and hybrid retrieval (pgvector plus full-text, rank fusion).
 - A bounded Claude tool-use agent with verified citations, and an eval suite of 34 scenarios with
@@ -17,7 +17,8 @@ script tag. A WooCommerce plugin is planned.
 - Spend limits: a token budget per conversation and a monthly cost cap per store. Past either,
   the shopper is handed to a person and the model is not called.
 
-See [docs/phases.md](docs/phases.md).
+Next: a demo against a Shopify development store, a live eval run through the API to report
+latency, and the WooCommerce plugin.
 
 ## Eval results
 
@@ -50,7 +51,9 @@ React dashboard (Vercel) ──► FastAPI core API
 
 The API is a modular monolith — see [docs/adr](docs/adr) for why, and for the
 other decisions that shape this repo (pgvector over a dedicated vector DB,
-row-level security for tenant isolation).
+row-level security for tenant isolation). [docs/architecture.md](docs/architecture.md)
+describes the agent loop, tools, and failure modes, and [docs/decisions.md](docs/decisions.md)
+records the smaller design decisions and the bugs that shaped them.
 
 ## Repo layout
 
@@ -60,7 +63,7 @@ row-level security for tenant isolation).
 | `dashboard/` | Merchant dashboard (React + TypeScript + Tailwind) |
 | `widget/` | Embeddable chat widget (vanilla TS) |
 | `plugin-woocommerce/` | WordPress plugin (planned, not started) |
-| `docs/adr/` | Architecture decision records |
+| `docs/` | Architecture, design decisions, testing, and ADRs (`docs/adr/`) |
 
 ## Local development
 
@@ -99,3 +102,7 @@ Postgres — it needs the compose database running. Coverage is gated at 90 perc
 Agent evals replay recorded model replies in CI (`uv run python -m evals.run`). To re-record,
 run `--live` with `ANTHROPIC_API_KEY`, or `--live --backend claude-code` to go through the
 Claude Code CLI instead. Security model: [SECURITY.md](SECURITY.md).
+
+## License
+
+MIT licensed, see [LICENSE](LICENSE).
