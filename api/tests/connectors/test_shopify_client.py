@@ -119,3 +119,37 @@ def test_webhook_payload_maps_to_the_same_ids_as_graphql() -> None:
     assert doc.external_id == "gid://shopify/Product/7"
     assert (doc.price_min, doc.price_max) == (Decimal("40.00"), Decimal("45.00"))
     assert doc.available is True
+
+
+def order_page(name: str) -> httpx.Response:
+    node = {
+        "id": "gid://shopify/Order/9",
+        "name": name,
+        "email": "sam@example.com",
+        "createdAt": "2026-11-01T10:00:00Z",
+        "displayFinancialStatus": "PAID",
+        "displayFulfillmentStatus": "FULFILLED",
+        "totalPriceSet": {"shopMoney": {"amount": "45.00", "currencyCode": "USD"}},
+        "lineItems": {"nodes": [{"title": "Leather Wallet", "quantity": 1}]},
+        "fulfillments": [],
+    }
+    return httpx.Response(200, json={"data": {"orders": {"nodes": [node]}}})
+
+
+def test_find_order_returns_only_the_order_that_was_asked_for() -> None:
+    queries: list[str] = []
+
+    def handler(name: str) -> httpx.MockTransport:
+        def respond(request: httpx.Request) -> httpx.Response:
+            queries.append(json.loads(request.content)["variables"]["q"])
+            return order_page(name)
+
+        return httpx.MockTransport(respond)
+
+    found = client_with(handler("#SW1042")).find_order("#sw1042")
+    other = client_with(handler("#10420")).find_order("1042")
+
+    assert found is not None
+    assert found.number == "SW1042"
+    assert other is None
+    assert queries == ["name:#sw1042", "name:#1042"]

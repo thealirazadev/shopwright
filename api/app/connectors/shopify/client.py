@@ -222,4 +222,8 @@ class ShopifyReadClient:
         if not number.isalnum():
             return None
         nodes = self._query(ORDER_QUERY, {"q": f"name:#{number}"})["orders"]["nodes"]
-        return OrderDoc.from_graphql(nodes[0]) if nodes else None
+        if not nodes:
+            return None
+        order = OrderDoc.from_graphql(nodes[0])
+        # Search is not an exact lookup; never hand back a different order than was asked for.
+        return order if order.number.casefold() == number.casefold() else None

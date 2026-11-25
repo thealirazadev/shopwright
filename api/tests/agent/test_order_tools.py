@@ -1,6 +1,7 @@
 import json
 import uuid
 from collections.abc import Iterator
+from dataclasses import replace
 
 import pytest
 from sqlalchemy import Connection, Engine, text
@@ -64,6 +65,20 @@ def test_wrong_email_and_unknown_order_look_the_same(ctx: ToolContext) -> None:
             "message": "Those details did not match an order.",
         }
     )
+    assert ctx.verified_orders == set()
+
+
+def test_an_order_without_an_email_never_verifies(ctx: ToolContext) -> None:
+    no_email = replace(ORDER, number="2001", email="")
+
+    class NoEmailOrders:
+        def find_order(self, order_number: str) -> OrderDoc | None:
+            return no_email if order_number == "2001" else None
+
+    ctx.orders = NoEmailOrders()
+
+    assert not call(ctx, "verify_customer", order_number="2001", email="")["verified"]
+    assert not call(ctx, "verify_customer", order_number="2001", email="  ")["verified"]
     assert ctx.verified_orders == set()
 
 

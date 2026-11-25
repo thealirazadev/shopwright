@@ -194,9 +194,11 @@ def _verify_customer(ctx: ToolContext, order_number: str, email: str) -> str:
         raise ToolInputError("too many verification attempts; offer a handoff instead")
     ctx.verify_attempts += 1
     number = normalize_order_number(order_number)
-    order = _find(ctx, number)
-    # Same answer for "no such order" and "wrong email", so orders cannot be probed.
-    if order is None or order.email.strip().lower() != email.strip().lower():
+    given = email.strip().lower()
+    order = _find(ctx, number) if given else None
+    # Same answer for "no such order" and "wrong email", so orders cannot be probed. An order
+    # with no email on it (a POS or draft order) never verifies: "" must not match "".
+    if order is None or not order.email.strip() or order.email.strip().lower() != given:
         return json.dumps({"verified": False, "message": "Those details did not match an order."})
     ctx.verified_orders.add(number)
     return json.dumps({"verified": True, "order_number": number})
