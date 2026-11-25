@@ -48,11 +48,17 @@ class ClaudeModel:
             )
         except anthropic.APIError as exc:
             raise ModelError(str(exc)) from exc
+        usage = response.usage
         return ModelReply(
             stop_reason=response.stop_reason or "end_turn",
             content=[block.model_dump(exclude_none=True) for block in response.content],
-            input_tokens=response.usage.input_tokens,
-            output_tokens=response.usage.output_tokens,
+            # With prompt caching, usage.input_tokens counts only the uncached tail. Budgets and
+            # the cost cap need every input token, so cache writes and reads are added back
+            # (as the claude-code eval backend already does).
+            input_tokens=usage.input_tokens
+            + (usage.cache_creation_input_tokens or 0)
+            + (usage.cache_read_input_tokens or 0),
+            output_tokens=usage.output_tokens,
         )
 
 
